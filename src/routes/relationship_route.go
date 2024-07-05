@@ -11,5 +11,4 @@ func SetupRelationshipRoutes(api *mux.Router) {
 	api.HandleFunc("/accept-request", controllers.AcceptFriendRequest).Methods("POST")
 	api.HandleFunc("/requests", controllers.GetAllFriendRequest).Methods("POST")
 	api.HandleFunc("/relationship", controllers.GetRelationship).Methods("POST")
-
 }
