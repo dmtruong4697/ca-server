@@ -23,7 +23,7 @@ type UpdatedPasword struct {
 
 // func get profile infomation
 func GetProfileInfo(w http.ResponseWriter, r *http.Request) {
-	user_id := r.Context().Value("id").(string)
+	user_id := r.Context().Value("id").(uint)
 
 	var dbUser models.User
 	if err := database.DB.Where("id = ?", user_id).First(&dbUser).Error; err != nil {
@@ -78,10 +78,10 @@ func UpdateProfileInfo(w http.ResponseWriter, r *http.Request) {
 
 // func update password
 func UpdatePassword(w http.ResponseWriter, r *http.Request) {
-	email := r.Context().Value("email").(string)
+	user_id := r.Context().Value("id").(uint)
 
 	var dbUser models.User
-	if err := database.DB.Where("email = ?", email).First(&dbUser).Error; err != nil {
+	if err := database.DB.Where("id = ?", user_id).First(&dbUser).Error; err != nil {
 		http.Error(w, "User not found", http.StatusUnauthorized)
 		return
 	}

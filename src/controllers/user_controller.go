@@ -28,10 +28,10 @@ type GetUserInfoResponce struct {
 }
 
 func GetUserInfo(w http.ResponseWriter, r *http.Request) {
-	current_user_id := r.Context().Value("id").(string)
+	current_user_id := r.Context().Value("id").(int)
 
 	// get user id from request body
-	var user_id UpdatedProfile
+	var user_id string
 	err := json.NewDecoder(r.Body).Decode(&user_id)
 	if err != nil {
 		http.Error(w, "Failed to decode user info", http.StatusBadRequest)

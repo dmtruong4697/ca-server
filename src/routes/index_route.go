@@ -27,5 +27,8 @@ func SetupRouter() *mux.Router {
 	// User routes
 	SetupUserRoutes(api)
 
+	// Relationship routes
+	SetupRelationshipRoutes(api)
+
 	return r
 }
