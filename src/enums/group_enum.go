@@ -1,0 +1,6 @@
+package enums
+
+const (
+	GROUP_TYPE_PERSONAL Status = "GROUP_TYPE_PERSONAL"
+	GROUP_TYPE_GROUP    Status = "GROUP_TYPE_GROUP"
+)

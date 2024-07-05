@@ -26,7 +26,7 @@ type FriendRequest struct {
 	Sender     GetUserInfoResponce `json:"sender"`
 }
 
-// func relationship
+// get relationship
 func GetRelationship(w http.ResponseWriter, r *http.Request) {
 	current_user_id := r.Context().Value("id").(uint)
 
@@ -51,7 +51,7 @@ func GetRelationship(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// func create friend request
+// create friend request
 func CreateFriendRequest(w http.ResponseWriter, r *http.Request) {
 	current_user_id := r.Context().Value("id").(uint)
 
@@ -78,7 +78,7 @@ func CreateFriendRequest(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-// func accept friend request
+// accept friend request
 func AcceptFriendRequest(w http.ResponseWriter, r *http.Request) {
 
 	// get request id from request body
@@ -101,7 +101,7 @@ func AcceptFriendRequest(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-// func get all friend request
+// get all friend request
 func GetAllFriendRequest(w http.ResponseWriter, r *http.Request) {
 	current_user_id := r.Context().Value("id").(uint)
 
