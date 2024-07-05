@@ -23,6 +23,11 @@ type LoginRequestBody struct {
 	DeviceToken string `json:"device_token"`
 }
 
+type LogoutRequestBody struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type LoginClaims struct {
 	ID    uint   `json:"id"`
 	Email string `json:"email"`
@@ -189,4 +194,35 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+// func logout
+func Logout(w http.ResponseWriter, r *http.Request) {
+	var userRequest LogoutRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&userRequest); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var dbUser models.User
+	if err := database.DB.Where("email = ?", userRequest.Email).First(&dbUser).Error; err != nil {
+		http.Error(w, "User not found", http.StatusUnauthorized)
+		return
+	}
+
+	if dbUser.Password != userRequest.Password {
+		http.Error(w, "Invalid password", http.StatusUnauthorized)
+		return
+	}
+
+	// set device token
+	dbUser.DeviceToken = ""
+	if err := database.DB.Save(&dbUser).Error; err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	message := "Logout successful."
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(message)
 }
