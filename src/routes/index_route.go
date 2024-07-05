@@ -22,14 +22,14 @@ func SetupRouter() *mux.Router {
 	// Auth routes
 	SetupAuthRoutes(r)
 
+	// Profile routes
+	SetupProfileRoutes(api)
+
 	// User routes
 	SetupUserRoutes(api)
 
 	// Chat routes
 	SetupChatRoutes(r)
-
-	// Channel routes
-	SetupChannelRoutes(api)
 
 	return r
 }
