@@ -70,3 +70,35 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to encode responce info", http.StatusInternalServerError)
 	}
 }
+
+func GetUserInfoFunction(current_user_id uint, user_id uint) GetUserInfoResponce {
+	current_user_id = current_user_id
+	user_id = user_id
+
+	// get user from database
+	var dbUser models.User
+	if err := database.DB.Where("id = ?", user_id).First(&dbUser).Error; err != nil {
+
+	}
+
+	var relationship models.Relationship
+	if err := database.DB.Where("(sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)", current_user_id, user_id, user_id, current_user_id).First(&relationship).Error; err != nil {
+
+	}
+
+	var responce GetUserInfoResponce
+	responce.ID = int(dbUser.ID)
+	responce.AccountStatus = dbUser.AccountStatus
+	responce.AvatarImage = dbUser.AvatarImage
+	responce.CreatedAt = dbUser.CreatedAt
+	responce.DateOfBirth = dbUser.DateOfBirth
+	responce.Email = dbUser.Email
+	responce.Gender = dbUser.Gender
+	responce.HashtagName = dbUser.HashtagName
+	responce.UserName = dbUser.UserName
+	responce.PhoneNumber = dbUser.PhoneNumber
+	responce.LastActive = dbUser.LastActive
+	responce.Relationship = relationship
+
+	return responce
+}
