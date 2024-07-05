@@ -6,9 +6,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func SetupProfileRoutes(r *mux.Router) {
-	r.HandleFunc("/register", controllers.Register).Methods("POST")
-	r.HandleFunc("/validate-email", controllers.ValidateEmail).Methods("POST")
-	r.HandleFunc("/login", controllers.Login).Methods("POST")
-	r.HandleFunc("/logout", controllers.Logout).Methods("POST")
+func SetupProfileRoutes(api *mux.Router) {
+	api.HandleFunc("/profile", controllers.GetProfileInfo).Methods("POST")
+	api.HandleFunc("/update-profile", controllers.UpdateProfileInfo).Methods("POST")
+	api.HandleFunc("/change-password", controllers.UpdatePassword).Methods("POST")
 }
