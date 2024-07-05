@@ -8,4 +8,6 @@ import (
 
 func SetupRelationshipRoutes(api *mux.Router) {
 	api.HandleFunc("/friend-request", controllers.CreateFriendRequest).Methods("POST")
+	api.HandleFunc("/accept-request", controllers.AcceptFriendRequest).Methods("POST")
+
 }
