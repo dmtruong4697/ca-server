@@ -2,7 +2,6 @@ package routes
 
 import (
 	"ca-server/src/middlewares"
-	_ "go-authentication/docs"
 
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -27,9 +26,6 @@ func SetupRouter() *mux.Router {
 
 	// User routes
 	SetupUserRoutes(api)
-
-	// Chat routes
-	SetupChatRoutes(r)
 
 	return r
 }
