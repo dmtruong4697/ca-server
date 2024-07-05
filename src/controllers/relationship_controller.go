@@ -43,3 +43,26 @@ func CreateFriendRequest(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 }
+
+// func accept friend request
+func AcceptFriendRequest(w http.ResponseWriter, r *http.Request) {
+
+	// get request id from request body
+	var request_id uint
+	err := json.NewDecoder(r.Body).Decode(&request_id)
+	if err != nil {
+		http.Error(w, "Failed to decode  id", http.StatusBadRequest)
+		return
+	}
+
+	// get request relationship from database
+	var relationship models.Relationship
+	if err := database.DB.Where("id = ?", request_id).First(&relationship).Error; err != nil {
+		http.Error(w, "Relationship not found", http.StatusUnauthorized)
+		return
+	}
+
+	relationship.Status = string(enums.FRIEND)
+
+	w.WriteHeader(http.StatusOK)
+}

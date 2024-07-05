@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"ca-server/src/database"
+	"ca-server/src/enums"
 	"ca-server/src/models"
 	"encoding/json"
 	"math/rand"
@@ -86,7 +87,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	validateCode := generateRandomCode(6)
 
 	user.ValidateCode = validateCode
-	user.AccountStatus = "PENDING"
+	user.AccountStatus = string(enums.PENDING)
 
 	if err := database.DB.Create(&user).Error; err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -119,7 +120,7 @@ func ValidateEmail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if dbUser.ValidateCode == validateEmailRequestBody.ValidateCode {
-		dbUser.AccountStatus = "VALIDATED"
+		dbUser.AccountStatus = string(enums.VERIFIED)
 		dbUser.ValidateCode = ""
 
 		if err := database.DB.Save(&dbUser).Error; err != nil {
