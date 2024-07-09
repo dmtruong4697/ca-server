@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"ca-server/src/database"
+	"ca-server/src/enums"
 	"ca-server/src/models"
 	"encoding/json"
+	"math/rand"
 	"net/http"
 	"time"
 )
@@ -30,6 +32,23 @@ type GroupInfo struct {
 
 type GroupList struct {
 	Groups []GroupInfo `json:"group_list"`
+}
+
+// random char
+func randomChar() byte {
+	chars := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	rand.Seed(time.Now().UnixNano())
+	index := rand.Intn(len(chars))
+	return chars[index]
+}
+
+// generate invite code
+func generateInviteCode() string {
+	code := make([]byte, 6)
+	for i := 0; i < 6; i++ {
+		code[i] = randomChar()
+	}
+	return string(code)
 }
 
 // get group info
@@ -199,5 +218,34 @@ func GetGroupList(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(responce); err != nil {
 		http.Error(w, "Failed to encode responce info", http.StatusInternalServerError)
+	}
+}
+
+// create personal group
+func CreatePersonalGroup(w http.ResponseWriter, r *http.Request) {
+	current_user_id := r.Context().Value("id").(uint)
+
+	var user_id uint
+	err := json.NewDecoder(r.Body).Decode(&user_id)
+	if err != nil {
+		http.Error(w, "Failed to decode user info", http.StatusBadRequest)
+	}
+
+	var newGroup models.Group
+	newGroup.CreatorID = current_user_id
+	newGroup.CreatedAt = time.Now()
+	newGroup.Type = string(enums.GROUP_TYPE_PERSONAL)
+	newGroup.IsAllowInviteCode = true
+	newGroup.InviteCode = generateInviteCode()
+
+	if err := database.DB.Create(&newGroup).Error; err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(newGroup); err != nil {
+		http.Error(w, "Failed to encode group info", http.StatusInternalServerError)
 	}
 }
