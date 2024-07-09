@@ -21,7 +21,7 @@ type UpdatedPasword struct {
 	Password string `json:"password"`
 }
 
-// func get profile infomation
+// get profile infomation
 func GetProfileInfo(w http.ResponseWriter, r *http.Request) {
 	user_id := r.Context().Value("id").(uint)
 
@@ -38,7 +38,7 @@ func GetProfileInfo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// func update profile infomation
+// update profile infomation
 func UpdateProfileInfo(w http.ResponseWriter, r *http.Request) {
 	email := r.Context().Value("email").(string)
 
@@ -76,7 +76,7 @@ func UpdateProfileInfo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// func update password
+// update password
 func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	user_id := r.Context().Value("id").(uint)
 

@@ -31,7 +31,7 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	current_user_id := r.Context().Value("id").(int)
 
 	// get user id from request body
-	var user_id string
+	var user_id uint
 	err := json.NewDecoder(r.Body).Decode(&user_id)
 	if err != nil {
 		http.Error(w, "Failed to decode user info", http.StatusBadRequest)
@@ -72,8 +72,6 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUserInfoFunction(current_user_id uint, user_id uint) GetUserInfoResponce {
-	current_user_id = current_user_id
-	user_id = user_id
 
 	// get user from database
 	var dbUser models.User
