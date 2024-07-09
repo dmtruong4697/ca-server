@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ca-server/src/controllers"
 	"ca-server/src/database"
 	"ca-server/src/routes"
 	"log"
@@ -13,6 +14,7 @@ func main() {
 	// init database
 	database.Connect()
 
+	go controllers.HandleMessages()
 	// Set up router
 	r := routes.SetupRouter()
 

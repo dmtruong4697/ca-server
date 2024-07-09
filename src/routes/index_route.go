@@ -33,5 +33,8 @@ func SetupRouter() *mux.Router {
 	// Group routes
 	SetupGroupRoutes(api)
 
+	// Chat routes
+	SetupChatRoutes(r)
+
 	return r
 }
