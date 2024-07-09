@@ -22,13 +22,17 @@ type Member struct {
 	IngroupName string              `json:"ingroup_name"`
 }
 
-type GetGroupInfoResponce struct {
+type GroupInfo struct {
 	Group       models.Group `json:"group"`
 	Members     []Member     `json:"members"`
 	LastMessage LastMessage  `json:"last_message"`
 }
 
-// get group detail
+type GroupList struct {
+	Groups []GroupInfo `json:"group_list"`
+}
+
+// get group info
 func GetGroupInfo(w http.ResponseWriter, r *http.Request) {
 	current_user_id := r.Context().Value("id").(uint)
 
@@ -88,10 +92,108 @@ func GetGroupInfo(w http.ResponseWriter, r *http.Request) {
 	last_message.Sender = GetUserInfoFunction(current_user_id, dbMessage.SenderID)
 
 	// init responce
-	var responce GetGroupInfoResponce
+	var responce GroupInfo
 	responce.Group = dbGroup
 	responce.Members = group_members_detail
 	responce.LastMessage = last_message
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(responce); err != nil {
+		http.Error(w, "Failed to encode responce info", http.StatusInternalServerError)
+	}
+}
+
+// get group info function
+func GetGroupInfoFunction(w http.ResponseWriter, r *http.Request) GroupInfo {
+	current_user_id := r.Context().Value("id").(uint)
+
+	var dbUser models.User
+	if err := database.DB.Where("id = ?", current_user_id).First(&dbUser).Error; err != nil {
+		http.Error(w, "User not found", http.StatusUnauthorized)
+	}
+
+	// get group id from request body
+	var group_id uint
+	err := json.NewDecoder(r.Body).Decode(&group_id)
+	if err != nil {
+		http.Error(w, "Failed to decode user info", http.StatusBadRequest)
+	}
+
+	// check user in group or not
+	var group_member models.GroupMember
+	if err := database.DB.Where("(user_id = ? AND group_id = ?)", current_user_id, group_id).First(&group_member).Error; err != nil {
+		http.Error(w, "User is not Group member", http.StatusBadRequest)
+	}
+
+	// get group from database
+	var dbGroup models.Group
+	if err := database.DB.Where("id = ?", group_id).First(&dbGroup).Error; err != nil {
+		http.Error(w, "Group not found", http.StatusBadRequest)
+	}
+
+	// get all member id
+	var group_members []models.GroupMember
+	if err := database.DB.Where("group_id = ?", group_id).Find(&group_members).Error; err != nil {
+		http.Error(w, "Group member not found", http.StatusBadRequest)
+	}
+
+	// get group members detail
+	var group_members_detail []Member
+	for i := range group_members {
+		group_members_detail[i].UserInfo = GetUserInfoFunction(current_user_id, group_members[i].UserID)
+		group_members_detail[i].JoinAt = group_member.JoinAt
+		group_members_detail[i].Status = group_member.Status
+		group_members_detail[i].IngroupName = group_member.IngroupName
+	}
+
+	// get last message detail
+	var dbMessage models.Message
+	if err := database.DB.Where("id = ?", dbGroup.LastMessageID).First(&dbMessage).Error; err != nil {
+
+	}
+	var last_message LastMessage
+	last_message.ID = dbMessage.ID
+	last_message.CreatedAt = dbMessage.CreatedAt
+	last_message.Content = dbMessage.Content
+	last_message.Sender = GetUserInfoFunction(current_user_id, dbMessage.SenderID)
+
+	// init responce
+	var responce GroupInfo
+	responce.Group = dbGroup
+	responce.Members = group_members_detail
+	responce.LastMessage = last_message
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(responce); err != nil {
+		http.Error(w, "Failed to encode responce info", http.StatusInternalServerError)
+	}
+
+	return responce
+}
+
+// get group list
+func GetGroupList(w http.ResponseWriter, r *http.Request) {
+	current_user_id := r.Context().Value("id").(uint)
+
+	var dbUser models.User
+	if err := database.DB.Where("id = ?", current_user_id).First(&dbUser).Error; err != nil {
+		http.Error(w, "User not found", http.StatusUnauthorized)
+		return
+	}
+
+	// find all group member with user id
+	var groups []models.GroupMember
+	if err := database.DB.Where("user_id = ?", current_user_id).Find(&groups).Error; err != nil {
+		http.Error(w, "Group member not found", http.StatusBadRequest)
+		return
+	}
+
+	var responce GroupList
+	for i := range groups {
+		responce.Groups[i] = GetGroupInfoFunction(w, r)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

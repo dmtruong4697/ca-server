@@ -8,4 +8,5 @@ import (
 
 func SetupGroupRoutes(api *mux.Router) {
 	api.HandleFunc("/group-info", controllers.GetGroupInfo).Methods("POST")
+	api.HandleFunc("/group-list", controllers.GetGroupList).Methods("POST")
 }
